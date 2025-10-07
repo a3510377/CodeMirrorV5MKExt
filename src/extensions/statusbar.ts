@@ -1,32 +1,33 @@
 import { MK_CUSTOM_COMPONENT } from '@/constants';
-import { createElement } from '@/utils/dom';
-
-import type { BaseExtension } from '.';
+import { createElement, createStyle } from '@/utils/dom';
 
 const statusBarClass = 'cm-statusbar';
-export const attachStatusBar = {
-  name: 'statusbar',
-  style: `$css
-    :root {
-      --statusbar-background: #f5f5f5;
-      --statusbar-color: #555;
-    }
 
-    .${MK_CUSTOM_COMPONENT}.${statusBarClass} {
-      gap: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      color: var(--statusbar-color);
-      background: var(--statusbar-background);
-      font-size: 12px;
-      padding: 4px 10px;
-      font-family: monospace;
-    }
-  `,
-  start(editor, _codeMirror, { container }) {
+const statusBarCSS = `$css
+  :root {
+    --statusbar-background: #f5f5f5;
+    --statusbar-color: #555;
+  }
+
+  .${MK_CUSTOM_COMPONENT}.${statusBarClass} {
+    gap: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: var(--statusbar-color);
+    background: var(--statusbar-background);
+    font-size: 12px;
+    padding: 4px 10px;
+    font-family: monospace;
+  }
+`;
+
+export const statusbar = () => {
+  window.CodeMirror.defineOptionPlus('statusbar', true, (editor) => {
+    const styleEl = createStyle(statusBarCSS);
+    styleEl.classList.add(statusBarClass);
+
     const statusBar = createElement('div', statusBarClass);
-
     statusBar.innerHTML = `$html
       <span>字數: <span id="char-count">0</span></span>
       <span>第 <span id="cursor-line">1</span> 行，第<span id="cursor-col">1</span> 欄
@@ -41,9 +42,9 @@ export const attachStatusBar = {
     const selectionCount =
       statusBar.querySelector<HTMLSpanElement>('#selection-count')!;
 
-    container.appendChild(statusBar);
+    editor.getWrapperElement().appendChild(statusBar);
 
-    const updateStatus = () => {
+    const updateStatus = (editor: CodeMirror.Editor) => {
       const text = editor.getValue();
       const cursor = editor.getCursor();
       const selLength = editor.getSelection().length;
@@ -57,12 +58,19 @@ export const attachStatusBar = {
 
     editor.on('changes', updateStatus);
     editor.on('cursorActivity', updateStatus);
-    updateStatus();
+    updateStatus(editor);
 
     return () => {
       editor.off('changes', updateStatus);
       editor.off('cursorActivity', updateStatus);
+      styleEl.remove();
       statusBar.remove();
     };
-  },
-} satisfies BaseExtension;
+  });
+};
+
+declare module 'codemirror' {
+  interface EditorConfiguration {
+    statusbar?: boolean;
+  }
+}

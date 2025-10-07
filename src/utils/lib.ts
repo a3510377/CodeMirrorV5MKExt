@@ -25,8 +25,6 @@ export class MKLibController {
     type?: 'js' | 'css',
     asyncLoad: boolean = false
   ): Promise<void> {
-    console.log('Add lib:', name, type, asyncLoad);
-
     if (!/^[\da-zA-Z\/]+$/.test(name)) return Promise.resolve();
 
     const promises: Promise<void>[] = [];

@@ -6,6 +6,7 @@ import type CodeMirror from 'codemirror';
 
 declare module 'codemirror' {
   const __mk_libs__: MKLibController;
+  const Init: { toString: () => 'CodeMirror.Init' };
   interface Editor {
     __mk_ext_closes__?: Map<string, (() => PromiseOrNot<void>) | null>;
   }

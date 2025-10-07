@@ -1,11 +1,15 @@
-import { type EditorElements } from './extensions';
-import { setupTokenHover } from './plugins/tokenHover';
+import { loadExtensions } from './extensions';
 import { createElement } from './utils/dom';
 import { MKLibController } from './utils/lib';
 import { loadLibFromOption } from './utils/loadLibFromOption';
 
+import './plugins/optionPlus';
+import './plugins/tokenHover';
+
 // @ts-ignore
 window.CodeMirror.__mk_libs__ = new MKLibController();
+
+loadExtensions();
 
 export const createEditor = async (options?: CreateEditorOptions) => {
   const editorContainer =
@@ -40,16 +44,10 @@ export const createEditor = async (options?: CreateEditorOptions) => {
   if (options?.value) editor.setValue(options.value as string);
 
   // plugins enable
-  setupTokenHover(editor);
-
-  const elements: EditorElements = {
-    container: editorContainer,
-    textarea,
-  };
 
   editor.refresh();
 
-  return { editor, elements, libController: window.CodeMirror.__mk_libs__ };
+  return { editor, libController: window.CodeMirror.__mk_libs__ };
 };
 
 export interface CreateEditorOptions

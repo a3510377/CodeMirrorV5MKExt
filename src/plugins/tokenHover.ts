@@ -8,14 +8,9 @@ interface TokenHoverHandler {
   ) => string | null;
 }
 
-const hoverRegistry = new WeakMap<
-  CodeMirror.Editor,
-  { handlers: Set<TokenHoverHandler>; dispose: () => void }
->();
+export const hoverTooltipClass = 'cm-hover-tooltip';
 
 export const setupTokenHover = (editor: CodeMirror.Editor, delay = 200) => {
-  if (hoverRegistry.has(editor)) return hoverRegistry.get(editor)!;
-
   const wrapper = editor.getWrapperElement();
   const handlers = new Set<TokenHoverHandler>();
 
@@ -24,7 +19,7 @@ export const setupTokenHover = (editor: CodeMirror.Editor, delay = 200) => {
   let timer: number | undefined;
 
   const styleEl = createStyle(`$css
-    .${MK_CUSTOM_COMPONENT}.cm-hover-tooltip {
+    .${MK_CUSTOM_COMPONENT}.${hoverTooltipClass} {
       position: absolute;
       z-index: 9999;
       background: rgba(40, 40, 40, 0.9);
@@ -114,38 +109,76 @@ export const setupTokenHover = (editor: CodeMirror.Editor, delay = 200) => {
   wrapper.addEventListener('mousemove', onMouseMove, { passive: true });
   wrapper.addEventListener('mouseleave', onMouseLeave, { passive: true });
 
-  const dispose = () => {
-    clearTimeout(timer);
-    styleEl.remove();
-    wrapper.removeEventListener('mousemove', onMouseMove);
-    wrapper.removeEventListener('mouseleave', onMouseLeave);
-    hideTooltip();
-    hoverRegistry.delete(editor);
+  return {
+    handlers,
+    dispose: () => {
+      handlers.clear();
+      hideTooltip();
+      clearTimeout(timer);
+      styleEl.remove();
+      wrapper.removeEventListener('mousemove', onMouseMove);
+      wrapper.removeEventListener('mouseleave', onMouseLeave);
+    },
   };
-
-  const entry = { handlers, dispose };
-  hoverRegistry.set(editor, entry);
-  return entry;
 };
 
-export const registerTokenHover = (
-  editor: CodeMirror.Editor,
-  getInfo: (token: CodeMirror.Token, editor: CodeMirror.Editor) => string | null
-) => {
-  const entry = hoverRegistry.get(editor);
-  if (!entry) {
-    throw new Error(
-      'Token hover system is not set up. Call setupTokenHover() first.'
-    );
+window.CodeMirror.defineInitHook(function (editor) {
+  const state: CodeMirror.EditorState = editor.state;
+
+  state.tokenHover?.dispose();
+  state.tokenHover = setupTokenHover(editor);
+});
+
+window.CodeMirror.defineExtension(
+  'registerTokenHover',
+  function (
+    this: CodeMirror.Editor,
+    getInfo: (
+      token: CodeMirror.Token,
+      editor: CodeMirror.Editor
+    ) => string | null
+  ) {
+    const entry = (this.state as CodeMirror.EditorState).tokenHover;
+    if (!entry) {
+      throw new Error(
+        'Token hover system is not set up. Call setupTokenHover() first.'
+      );
+    }
+
+    const handler: TokenHoverHandler = { getInfo };
+    entry.handlers.add(handler);
+
+    return () => {
+      entry.handlers.delete(handler);
+      if (entry.handlers.size === 0) {
+        entry.dispose();
+      }
+    };
+  }
+);
+
+window.CodeMirror.defineExtension(
+  'unregisterTokenHover',
+  function (this: CodeMirror.Editor, dispose: () => void) {
+    dispose();
+  }
+);
+
+declare module 'codemirror' {
+  interface EditorState {
+    tokenHover?: {
+      dispose: () => void;
+      handlers: Set<TokenHoverHandler>;
+    };
   }
 
-  const handler: TokenHoverHandler = { getInfo };
-  entry.handlers.add(handler);
-
-  return () => {
-    entry.handlers.delete(handler);
-    if (entry.handlers.size === 0) {
-      entry.dispose();
-    }
-  };
-};
+  interface Editor {
+    registerTokenHover: (
+      getInfo: (
+        token: CodeMirror.Token,
+        editor: CodeMirror.Editor
+      ) => string | null
+    ) => () => void;
+    unregisterTokenHover: (dispose: () => void) => void;
+  }
+}

@@ -1,8 +1,5 @@
 import { MK_CUSTOM_COMPONENT } from '@/constants';
-import { registerTokenHover } from '@/plugins/tokenHover';
-import { createElement } from '@/utils/dom';
-
-import type { BaseExtension } from '.';
+import { createElement, createStyle } from '@/utils/dom';
 
 const Names: { [key: string]: string } = {
   0x0000: '空值',
@@ -28,31 +25,38 @@ const Names: { [key: string]: string } = {
   0xfffc: '物件替代符',
 };
 
-export const specialCharsShow = {
-  name: 'specialCharsShow',
-  style: `$css
-    :root {
-      --mk-cm-space-color: #dfdfdf;
-    }
+const specialCharsShowCSS = `$css
+  :root {
+    --mk-cm-space-color: #dfdfdf;
+  }
 
-    .cm-tab {
-      background-size: auto 100%;
-      background-repeat: no-repeat;
-      background-position: right 90%;
-      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='20'><path stroke='%23888' stroke-width='1' fill='none' d='M1 10H196L190 5M190 15L196 10M197 4L197 16'/></svg>");
-    }
+  .cm-tab {
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: right 90%;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='20'><path stroke='%23888' stroke-width='1' fill='none' d='M1 10H196L190 5M190 15L196 10M197 4L197 16'/></svg>");
+  }
 
-    .${MK_CUSTOM_COMPONENT}.cm-space::before {
-      content: '·';
-      color: var(--mk-cm-space-color);
-    }
-  `,
-  libs: [],
-  start(editor) {
-    const oldSpecialChars = editor.getOption('specialChars');
+  .${MK_CUSTOM_COMPONENT}.cm-space::before {
+    content: '·';
+    color: var(--mk-cm-space-color);
+  }
+`;
+
+const OLD_SPECIAL_CHARS =
+  window.CodeMirror.defaults.specialChars ??
+  /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b\u200e\u200f\u2028\u2029\u202d\u202e\u2066\u2067\u2069\ufeff\ufff9-\ufffc]/g;
+
+const specialCharsShowClass = 'cm-special-chars-show';
+
+export const specialCharsShow = () => {
+  window.CodeMirror.defineOptionPlus('specialCharsShow', true, (editor) => {
+    const styleEl = createStyle(specialCharsShowCSS);
+    styleEl.classList.add(specialCharsShowClass);
+
     editor.setOption(
       'specialChars',
-      /[ \u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u061c\u200b\u200e\u200f\u2028\u2029\u202d\u202e\u2066\u2067\u2069\ufeff\ufff9-\ufffc]/
+      /[ \u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b\u200e\u200f\u2028\u2029\u202d\u202e\u2066\u2067\u2069\ufeff\ufff9-\ufffc]/
     );
     editor.setOption('specialCharPlaceholder', (ch) => {
       if (ch === ' ') {
@@ -75,7 +79,7 @@ export const specialCharsShow = {
       return el;
     });
 
-    const unregisterHover = registerTokenHover(editor, (token) => {
+    const specialCharsHoverTokenClose = editor.registerTokenHover((token) => {
       if (!token.string.trim()) return null;
 
       const ch = token.string[0];
@@ -92,8 +96,15 @@ export const specialCharsShow = {
     });
 
     return () => {
-      unregisterHover();
-      editor.setOption('specialChars', oldSpecialChars);
+      styleEl.remove();
+      specialCharsHoverTokenClose();
+      editor.setOption('specialChars', OLD_SPECIAL_CHARS);
     };
-  },
-} satisfies BaseExtension;
+  });
+};
+
+declare module 'codemirror' {
+  interface EditorConfiguration {
+    specialCharsShow?: boolean;
+  }
+}
