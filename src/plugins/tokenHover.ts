@@ -14,9 +14,9 @@ export const setupTokenHover = (editor: CodeMirror.Editor, delay = 200) => {
   const wrapper = editor.getWrapperElement();
   const handlers = new Set<TokenHoverHandler>();
 
+  let timer: number | undefined;
   let tooltip: HTMLDivElement | null = null;
   let lastToken: CodeMirror.Token | null = null;
-  let timer: number | undefined;
 
   const styleEl = createStyle(`$css
     .${MK_CUSTOM_COMPONENT}.${hoverTooltipClass} {
@@ -46,19 +46,19 @@ export const setupTokenHover = (editor: CodeMirror.Editor, delay = 200) => {
     }
     tooltip.textContent = text;
 
-    const offset = 12;
+    const offset = 10;
     const rect = tooltip.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
     let x = e.pageX + offset - rect.width / 2;
-    let y = e.pageY + offset;
+    let y = e.pageY - rect.height - offset;
 
     if (x < 8) x = 8;
     if (x + rect.width > vw - 8) x = vw - rect.width - 8;
 
-    if (y + rect.height > vh - 8) y = e.pageY - rect.height - offset;
-    if (y < 8) y = 8;
+    if (y < 8) y = e.pageY + offset;
+    if (y + rect.height > vh - 8) y = vh - rect.height - 8;
 
     tooltip.style.top = `${y}px`;
     tooltip.style.left = `${x}px`;
@@ -130,8 +130,6 @@ const setupTokenHoverHook = (editor: CodeMirror.Editor) => {
 
   return state.tokenHover;
 };
-
-window.CodeMirror.defineInitHook(setupTokenHoverHook);
 
 window.CodeMirror.defineExtension(
   'registerTokenHover',
