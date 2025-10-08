@@ -11,10 +11,7 @@ window.CodeMirror.defineOptionPlus = function (
   options = { autoDispose: true, ...options };
 
   window.CodeMirror.defineOption(name, default_, async (cm, val, old) => {
-    // eslint-disable-next-line eqeqeq
-    if (old == window.CodeMirror.Init) old = null;
-
-    console.log(`[OptionPlus:${name}]`, { val, old });
+    if (old === window.CodeMirror.Init) old = null;
 
     cm.__optionPlus__ ??= { dispose: {} };
 

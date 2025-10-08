@@ -122,12 +122,16 @@ export const setupTokenHover = (editor: CodeMirror.Editor, delay = 200) => {
   };
 };
 
-window.CodeMirror.defineInitHook(function (editor) {
+const setupTokenHoverHook = (editor: CodeMirror.Editor) => {
   const state: CodeMirror.EditorState = editor.state;
 
   state.tokenHover?.dispose();
   state.tokenHover = setupTokenHover(editor);
-});
+
+  return state.tokenHover;
+};
+
+window.CodeMirror.defineInitHook(setupTokenHoverHook);
 
 window.CodeMirror.defineExtension(
   'registerTokenHover',
@@ -138,7 +142,9 @@ window.CodeMirror.defineExtension(
       editor: CodeMirror.Editor
     ) => string | null
   ) {
-    const entry = (this.state as CodeMirror.EditorState).tokenHover;
+    const entry =
+      (this.state as CodeMirror.EditorState).tokenHover ??
+      setupTokenHoverHook(this);
     if (!entry) {
       throw new Error(
         'Token hover system is not set up. Call setupTokenHover() first.'
