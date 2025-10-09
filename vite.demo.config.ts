@@ -5,15 +5,17 @@ import { defineConfig, mergeConfig } from 'vite';
 export default mergeConfig(
   baseConfig,
   defineConfig({
+    worker: {
+      rollupOptions: {
+        output: {
+          entryFileNames: 'MKPyodideWorker.js',
+          inlineDynamicImports: true,
+        },
+      },
+    },
     build: {
       ...baseConfig.build,
-      outDir: 'dist/main',
-      lib: {
-        entry: 'src/index.ts',
-        name: 'MKCodeMirror5',
-        fileName: 'MKCodeMirror5',
-        formats: ['iife', 'cjs'],
-      },
+      outDir: 'dist/demo',
     },
   })
 );
