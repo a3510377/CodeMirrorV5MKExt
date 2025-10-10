@@ -16,13 +16,13 @@ class WorkerWrapper {
 export class WorkerPool {
   protected pool: WorkerWrapper[] = [];
   protected queue: Task[] = [];
-  protected maxExecutionTime = 5000; // ms
+  protected maxExecutionTime;
   protected appendOutput: AppendOutputHandler;
 
   constructor(
     size: number,
     appendOutput: AppendOutputHandler,
-    maxExecutionTime = 5000
+    maxExecutionTime = 5_000 // 5 seconds
   ) {
     for (let i = 0; i < size; i++) {
       this.pool.push(new WorkerWrapper());
@@ -124,7 +124,10 @@ export interface Task extends PyodideRunnerMessageEventData {
   reject: (err: PyodideWokePoolResultError) => void;
 }
 
-export type AppendOutputHandler = (text: string, type: 'log' | 'err') => void;
+export type AppendOutputHandler = (
+  text?: string,
+  type?: 'log' | 'err' | 'divider'
+) => void;
 
 export interface PyodideWokePoolResultSuccess {
   type: 'success';

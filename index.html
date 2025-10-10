@@ -12,25 +12,96 @@
     />
 
     <style>
-      #output span[data-type='err'] {
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        min-height: 100vh;
+      }
+
+      .container {
+        flex: 1;
+        width: 80%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+
+        padding: 1rem;
+        max-width: 800px;
+      }
+
+      #editor {
+        width: 100%;
+        height: 300px;
+        border: 1px solid #ccc;
+        margin-bottom: 1rem;
+      }
+
+      #output {
+        height: 300px;
+        width: 100%;
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+        background-color: #f9f9f9;
+        overflow-y: scroll;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+
+        scrollbar-width: thin;
+        scrollbar-color: #bbb #f0f0f0;
+      }
+
+      #output::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #output::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 4px;
+      }
+
+      #output::-webkit-scrollbar-thumb {
+        background-color: #bbb;
+        border-radius: 4px;
+        border: 2px solid #f0f0f0;
+      }
+
+      #output::-webkit-scrollbar-thumb:hover {
+        background-color: #999;
+      }
+
+      #output > div {
+        line-height: 1.5;
+        min-height: 1em;
+      }
+
+      #output > div span[data-type='err'] {
         color: #e74c3c;
+        font-weight: bold;
+      }
+
+      #output > div span[data-type='out'] {
+        color: #333;
       }
     </style>
   </head>
   <body>
     <div id="app">
-      <div id="editor"></div>
+      <div class="container">
+        <div id="editor"></div>
 
-      <button id="run-btn">Run</button>
-      <pre
-        id="output"
-        style="
-          border: 1px solid #ccc;
-          padding: 8px;
-          height: 120px;
-          overflow: auto;
-        "
-      ></pre>
+        <button id="run-btn">Run</button>
+
+        <pre id="output"></pre>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>

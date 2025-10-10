@@ -35,14 +35,13 @@ export const createPyodideWorkerPool = (
           );
           return;
         } else if (errorCode === 'CODE_EMPTY') {
-          appendOutput('Error - CODE_EMPTY\n', 'err');
+          // do nothing
           return;
         } else if (errorCode === 'SETUP_CODE_ERROR') {
-          appendOutput(`內部錯誤: ${errorMessage}\n`, 'err');
+          appendOutput(`內部錯誤，請聯繫管理員: ${errorMessage}\n`, 'err');
           return;
         }
       }
-      console.log(typeof err, err);
 
       // if ('err' in err) {
       //   if (err.err === 'EXEC_TIMEOUT') {
@@ -60,9 +59,10 @@ export const createPyodideWorkerPool = (
       //   }
       // }
 
+      console.error(typeof err, err);
       appendOutput('Error: ' + err + '\n', 'err');
     } finally {
-      appendOutput('\n───────────────────────────────\n', 'log');
+      appendOutput(undefined, 'divider');
     }
   };
 };
@@ -78,11 +78,32 @@ export const createDefaultOutputHandler = (
   const MAX_LINES = options.MAX_LINES || 500;
   let currentLine: Element | null = null;
 
+  const tryScrollToBottom = () => {
+    if (options.forceDown === undefined || options.forceDown) {
+      outputEl.scrollTop = outputEl.scrollHeight;
+    }
+  };
+
   return ((text, type = 'log') => {
     const isError = type === 'err';
-    const lines = text.split(/\r?\n/);
 
-    lines.forEach((line, index) => {
+    if (type === 'divider') {
+      outputEl.appendChild(document.createElement('hr'));
+      if (text) {
+        const span = document.createElement('span');
+        span.textContent = text;
+        outputEl.appendChild(span);
+      }
+      currentLine = null;
+
+      tryScrollToBottom();
+      return;
+    }
+
+    const lines = text?.split(/\r?\n/);
+    // remove last empty line ("\n" -> ["", ""])
+    if (lines?.length && lines.at(-1) === '') lines.pop();
+    lines?.forEach((line, index) => {
       if (!currentLine) {
         currentLine = document.createElement('div');
         outputEl.appendChild(currentLine);
@@ -105,14 +126,13 @@ export const createDefaultOutputHandler = (
         currentLine.appendChild(lastSpan);
       }
 
+      // || '\u00A0';
       lastSpan.textContent += line;
 
       // if not the last line, reset currentLine to null to create a new line
-      if (index < lines.length - 1) currentLine = null;
+      if (index <= lines.length - 1) currentLine = null;
     });
 
-    if (options.forceDown === undefined || options.forceDown) {
-      outputEl.scrollTop = outputEl.scrollHeight;
-    }
+    tryScrollToBottom();
   }) satisfies AppendOutputHandler;
 };

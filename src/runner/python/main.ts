@@ -2,18 +2,6 @@ import { createDefaultOutputHandler, createPyodideWorkerPool } from '.';
 import { createEditor } from '@';
 
 const testCode = `
-import sys
-
-class AutoFlushIO:
-    def __init__(self, stream):
-        self.stream = stream
-    def write(self, s):
-        self.stream.write(s)
-        self.stream.flush()
-    def flush(self):
-        self.stream.flush()
-
-sys.stderr = AutoFlushIO(sys.__stderr__)
 raise Exception("test")
 `;
 

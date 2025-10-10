@@ -59,10 +59,19 @@ self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
   };
 
   try {
+    // disable js, pyodide... modules
+    await pyodide.runPythonAsync(
+      'import builtins,sys,types;[n for n in list(sys.modules) if any(n==m or n.startswith(m+".")for m in["js","pyodide","pyodide_js","micropip"]) and sys.modules.pop(n)];_d=types.SimpleNamespace(__getattr__=lambda s,k:(_ for _ in()).throw(RuntimeError(f"Access to {k} module is blocked")));[sys.modules.__setitem__(n,_d) for n in["js","pyodide","pyodide_js","micropip"]];builtins.__import__=(lambda _i:lambda n,*a,**kw:(_ for _ in()).throw(ImportError(f"Import of {n!r} is disabled"))if any(n==m or n.startswith(m+".")for m in["js","pyodide","pyodide_js","micropip"])else _i(n,*a,**kw))(builtins.__import__);del builtins,sys,types,_d'
+    );
+    // show traceback except those from pyodide internal
+    await pyodide.runPythonAsync(
+      '__import__("sys").excepthook=lambda a,b,c:print(("".join(__import__("traceback").format_list([d for d in __import__("traceback").extract_tb(c)if not d.filename.startswith(("/lib/python", "<frozen"))])).lstrip()+"".join(__import__("traceback").format_exception_only(a,b))).strip("\\n"), file=__import__("sys").stderr)'
+    );
     // force flush after each print
     await pyodide.runPythonAsync(
       '__import__("sys").stdout=type("",(),{"__init__":lambda s,a:setattr(s,"a",a),"write":lambda s,x:(s.a.write(x),s.a.flush()),"flush":lambda s:s.a.flush()})(__import__("sys").__stdout__);__import__("sys").stderr=type("",(),{"__init__":lambda s,a:setattr(s,"a",a),"write":lambda s,x:(s.a.write(x),s.a.flush()),"flush":lambda s:s.a.flush()})(__import__("sys").__stderr__)'
     );
+
     // setup code
     for (const item of options?.setupCode || []) {
       await pyodide.runPythonAsync(item.code, { globals }).catch((err) => {
