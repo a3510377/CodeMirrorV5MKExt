@@ -14,7 +14,6 @@ export default mergeConfig(
       },
     },
     build: {
-      ...baseConfig.build,
       outDir: 'dist/worker',
       lib: {
         entry: 'src/runner/python/index.ts',

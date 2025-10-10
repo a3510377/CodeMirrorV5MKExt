@@ -16,17 +16,21 @@
       body {
         margin: 0;
         padding: 0;
+        height: 100%;
       }
 
       #app {
         display: flex;
-        flex-direction: column;
         align-items: center;
+        flex-direction: column;
+        justify-content: center;
 
+        height: 100%;
         min-height: 100vh;
       }
 
       .container {
+        max-height: 60rem;
         flex: 1;
         width: 80%;
         display: flex;
@@ -36,17 +40,28 @@
 
         padding: 1rem;
         max-width: 800px;
+        min-height: 0;
       }
 
       #editor {
+        flex: 1;
         width: 100%;
-        height: 300px;
         border: 1px solid #ccc;
         margin-bottom: 1rem;
+        flex-shrink: 0;
+      }
+
+      #editor .CodeMirror.cm-s-default,
+      #editor .mk-component.editor-container {
+        height: 100%;
+      }
+
+      #run-btn {
+        flex-shrink: 0;
       }
 
       #output {
-        height: 300px;
+        flex: 1;
         width: 100%;
         border: 1px solid #ccc;
         padding: 0.5rem;
@@ -98,7 +113,7 @@
       <div class="container">
         <div id="editor"></div>
 
-        <button id="run-btn">Run</button>
+        <button id="run-btn" disabled>Run</button>
 
         <pre id="output"></pre>
       </div>

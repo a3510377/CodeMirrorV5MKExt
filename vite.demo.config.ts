@@ -14,7 +14,6 @@ export default mergeConfig(
       },
     },
     build: {
-      ...baseConfig.build,
       outDir: 'dist/demo',
     },
   })

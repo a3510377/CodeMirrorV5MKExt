@@ -15,7 +15,7 @@ const withCssLibs: LibName[] = [
 ];
 
 export class MKLibController {
-  private libs: { [key: string]: string } = {};
+  private _libs: { [key: string]: string } = {};
 
   public static getLibElementID = (name: string, type: 'js' | 'css') =>
     `${name.replace(/[^a-z0-9]/gi, '-')}-lib-${type}`;
@@ -55,7 +55,7 @@ export class MKLibController {
     asyncLoad: boolean = true
   ): Promise<void> {
     const id = MKLibController.getLibElementID(name, 'js');
-    this.libs[id] = url;
+    this._libs[id] = url;
 
     if (document.getElementById(id)) return Promise.resolve();
 
@@ -74,7 +74,7 @@ export class MKLibController {
 
   addStyle(name: string, url: string) {
     const id = MKLibController.getLibElementID(name, 'css');
-    this.libs[id] = url;
+    this._libs[id] = url;
 
     if (document.getElementById(id)) return;
 
@@ -86,18 +86,18 @@ export class MKLibController {
   }
 
   getLib(name: string, type: 'js' | 'css') {
-    return this.libs[MKLibController.getLibElementID(name, type)];
+    return this._libs[MKLibController.getLibElementID(name, type)];
   }
 
   removeLib(name: string, type: 'js' | 'css') {
     const id = MKLibController.getLibElementID(name, type);
     const el = document.getElementById(id);
     if (el) el.parentNode?.removeChild(el);
-    delete this.libs[id];
+    delete this._libs[id];
   }
 
   getAllLibs() {
-    return { ...this.libs };
+    return { ...this._libs };
   }
 }
 

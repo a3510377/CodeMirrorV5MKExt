@@ -4,10 +4,12 @@ import * as lightningcss from 'lightningcss';
 import path from 'path';
 import postcss from 'postcss';
 import { defineConfig } from 'vite';
+import htmlFileMinify from 'vite-plugin-html-minifier';
 
 export const baseConfig = {
   // TODO move to plugins dir
   plugins: [
+    htmlFileMinify(),
     {
       name: 'vite-plugin-minify-html-css-template',
       enforce: 'pre',

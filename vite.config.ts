@@ -6,7 +6,6 @@ export default mergeConfig(
   baseConfig,
   defineConfig({
     build: {
-      ...baseConfig.build,
       outDir: 'dist/main',
       lib: {
         entry: 'src/index.ts',

@@ -1,23 +1,25 @@
 import { loadPyodide } from 'pyodide';
 
+const postMessage = self.postMessage.bind(self) as (
+  msg: PyodideRunnerMessageEventResult
+) => void;
+
 let pyodideReadyPromise = (async () => {
   const pyodide = await loadPyodide({
     indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.28.3/full/',
   });
 
+  postMessage({ type: 'ready' });
+
   return pyodide;
 })();
 
-const postMessage = self.postMessage.bind(self) as (
-  msg: PyodideRunnerMessageEventResult
-) => void;
-
 self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
   const pyodide = await pyodideReadyPromise;
-  const { id, code, options } = event.data;
+  const { code, options } = event.data;
 
   if (!code) {
-    postMessage({ id, type: 'error', error: 'CODE_EMPTY' });
+    postMessage({ type: 'error', error: 'CODE_EMPTY' });
     return;
   }
 
@@ -25,13 +27,17 @@ self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
   let bufErr: number[] = [];
 
   let lastFlushTime = 0;
-  const FLUSH_INTERVAL = 4;
+  const FLUSH_INTERVAL = 5;
   const MAX_BATCH = 50;
 
-  const flushBatch = (buf: number[], type: 'stdout' | 'stderr') => {
+  const flushBatch = (
+    buf: number[],
+    type: 'stdout' | 'stderr',
+    size?: number
+  ) => {
     if (buf.length) {
-      const batch = buf.splice(0, MAX_BATCH);
-      postMessage({ id, type, data: batch });
+      const batch = buf.splice(0, size ?? MAX_BATCH);
+      postMessage({ type, data: batch });
     }
     return buf;
   };
@@ -54,8 +60,8 @@ self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
   const globals = dict(Object.entries(options?.context || {}));
 
   const forceFlush = () => {
-    flushBatch(bufOut, 'stdout');
-    flushBatch(bufErr, 'stderr');
+    flushBatch(bufOut, 'stdout', bufOut.length);
+    flushBatch(bufErr, 'stderr', bufErr.length);
   };
 
   try {
@@ -80,26 +86,28 @@ self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
     }
   } catch (err: any) {
     postMessage({
-      id,
       type: 'error',
       error: { code: 'SETUP_CODE_ERROR', message: err.toString() },
     });
     return;
   }
 
+  let index = 0;
+  pyodide.setStdin({ stdin: () => options?.inputs?.at(index++) });
+
   try {
     const result = await pyodide.runPythonAsync(code, { globals });
 
+    index = 0;
     forceFlush();
     postMessage({
-      id,
       type: 'end',
       result: { type: 'success', result },
     });
   } catch (err: any) {
+    index = 0;
     forceFlush();
     postMessage({
-      id,
       type: 'end',
       result: { type: 'error', error: err.toString() },
     });
@@ -109,7 +117,6 @@ self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
 export type PyodideRunnerWorkerID = string;
 
 export type PyodideRunnerMessageEventData = {
-  id: PyodideRunnerWorkerID;
   code: string;
   options?: {
     inputs?: string[];
@@ -121,19 +128,18 @@ export type PyodideRunnerMessageEventData = {
 export type PyodideRunnerErrorCodes = 'CODE_EMPTY' | 'SETUP_CODE_ERROR';
 
 export type PyodideRunnerMessageEventResult =
+  | { type: 'ready' }
   | {
-      id: PyodideRunnerWorkerID;
       type: 'end';
       result:
         | { type: 'success'; result: any }
         | { type: 'error'; error: string };
     }
   | {
-      id: PyodideRunnerWorkerID;
       type: 'error';
       error:
         | PyodideRunnerErrorCodes
         | { code: PyodideRunnerErrorCodes; message: string };
     }
-  | { id: PyodideRunnerWorkerID; type: 'stdout'; data: number[] }
-  | { id: PyodideRunnerWorkerID; type: 'stderr'; data: number[] };
+  | { type: 'stdout'; data: number[] }
+  | { type: 'stderr'; data: number[] };
