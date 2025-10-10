@@ -5,8 +5,8 @@ const statusBarClass = 'cm-statusbar';
 
 const statusBarCSS = `$css
   :root {
-    --statusbar-background: #f5f5f5;
-    --statusbar-color: #555;
+    --cm-statusbar-color: #555;
+    --cm-statusbar-background: #f5f5f5;
   }
 
   .${MK_CUSTOM_COMPONENT}.${statusBarClass} {
@@ -14,8 +14,8 @@ const statusBarCSS = `$css
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    color: var(--statusbar-color);
-    background: var(--statusbar-background);
+    color: var(--cm-statusbar-color);
+    background: var(--cm-statusbar-background);
     font-size: 12px;
     padding: 4px 10px;
     font-family: monospace;

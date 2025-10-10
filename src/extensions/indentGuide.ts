@@ -6,7 +6,7 @@ import type CodeMirror from 'codemirror';
 const indentGuideClass = 'cm-indent-guide';
 const indentGuideCSS = `$css
   :root {
-    --mk-indent-guide-color: #e0e0e0;
+    --cm-indent-guide-color: #e0e0e0;
   }
 
   .${MK_CUSTOM_COMPONENT}.${indentGuideClass} {
@@ -18,8 +18,8 @@ const indentGuideCSS = `$css
     pointer-events: none;
     background-image: repeating-linear-gradient(
       to right,
-      var(--mk-indent-guide-color) 0,
-      var(--mk-indent-guide-color) 1px,
+      var(--cm-indent-guide-color) 0,
+      var(--cm-indent-guide-color) 1px,
       transparent 1px,
       transparent 100%
     );
@@ -34,7 +34,21 @@ const updateIndentGuide = (
 ) => {
   const text = line.text;
   const indentUnit = cm.getOption('indentUnit') ?? 2;
-  const indentLevel = Math.ceil(text.search(/\S|$/) / indentUnit) ?? 16;
+
+  let spaceCount = 0;
+  let indentLevel = 0;
+
+  for (const char of text) {
+    if (char === ' ') {
+      spaceCount++;
+    } else if (char === '\t') {
+      indentLevel += 1;
+    } else {
+      break;
+    }
+  }
+
+  indentLevel += Math.ceil(spaceCount / indentUnit);
 
   if (elt.dataset.indentLevel === indentLevel.toString()) return;
 
@@ -50,7 +64,7 @@ const updateIndentGuide = (
     '--indent-width',
     indentUnit * indentLevel * charWidth + 'px'
   );
-  guide.style.setProperty('--indent-size', charWidth * indentUnit + 'px');
+  guide.style.setProperty('--indent-size', indentUnit * charWidth + 'px');
 };
 
 export const indentGuide = () => {

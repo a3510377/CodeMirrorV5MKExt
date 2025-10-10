@@ -27,7 +27,7 @@ const Names: { [key: string]: string } = {
 
 const specialCharsShowCSS = `$css
   :root {
-    --mk-cm-space-color: #dfdfdf;
+    --cm-space-color: #dfdfdf;
   }
 
   .cm-tab {
@@ -39,7 +39,7 @@ const specialCharsShowCSS = `$css
 
   .${MK_CUSTOM_COMPONENT}.cm-space::before {
     content: '·';
-    color: var(--mk-cm-space-color);
+    color: var(--cm-space-color);
   }
 `;
 
