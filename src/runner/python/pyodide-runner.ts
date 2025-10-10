@@ -27,8 +27,11 @@ self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
   let bufErr: number[] = [];
 
   let lastFlushTime = 0;
-  const FLUSH_INTERVAL = 5;
-  const MAX_BATCH = 50;
+
+  // If the interval is 0, the main thread will be blocked
+  // -> while True: print("test")
+  const FLUSH_INTERVAL = 4; // ms
+  const MAX_BATCH = 50; // max number of chars to send in one batch
 
   const flushBatch = (
     buf: number[],

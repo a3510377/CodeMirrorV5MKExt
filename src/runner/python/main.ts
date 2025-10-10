@@ -1,9 +1,12 @@
 import { createDefaultOutputHandler, WorkerPool } from '.';
 import { createEditor } from '@';
 
+// Maximum number of output lines to keep
 const MAX_LINES = 500;
+// Maximum number of workers to run code (to limit resource usage)
 const MAX_WORKERS = 2;
-const EXECUTION_TIMEOUT = 5000; // ms
+// Maximum execution time for each code run (in ms)
+const EXECUTION_TIMEOUT = 10_000; // ms
 
 const ERROR_MESSAGES = {
   EXEC_TIMEOUT: '程式執行時間過長，已被強制終止',

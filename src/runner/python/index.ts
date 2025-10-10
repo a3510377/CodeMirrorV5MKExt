@@ -9,7 +9,8 @@ export const createDefaultOutputHandler = (
   options: { MAX_LINES?: number; forceDown?: boolean } = {}
 ) => {
   const MAX_LINES = options.MAX_LINES || 500;
-  let currentLine: Element | null = null;
+  let currentLine: HTMLDivElement | null = null;
+  let lineIndex = 1;
 
   const tryScrollToBottom = () => {
     if (options.forceDown !== false) {
@@ -28,6 +29,7 @@ export const createDefaultOutputHandler = (
         outputEl.appendChild(span);
       }
       currentLine = null;
+      lineIndex = 1;
 
       tryScrollToBottom();
       return;
@@ -38,6 +40,7 @@ export const createDefaultOutputHandler = (
     lines?.forEach((line, index) => {
       if (!currentLine) {
         currentLine = document.createElement('div');
+        currentLine.dataset.line = String(lineIndex++);
         outputEl.appendChild(currentLine);
 
         // clear old lines
