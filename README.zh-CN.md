@@ -2,7 +2,7 @@
 
 一个强大的 CodeMirror 5 扩展库，添加了现代 IDE 级别的功能和增强特性，以创造更好的代码编辑体验。
 
-[English](./README.md) | 简体中文
+[English](./README.md) | 简体中文 | [繁體中文](./README.zh-TW.md)
 
 ## 功能特性
 
