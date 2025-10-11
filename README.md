@@ -2,7 +2,7 @@
 
 A powerful extension library for CodeMirror 5 that adds modern IDE-like features and enhancements to create a better code editing experience.
 
-English | [简体中文](./README.zh-CN.md) | [繁體中文](./README.zh-TW.md)
+English [繁體中文](./README.zh-TW.md)
 
 ## Features
 
