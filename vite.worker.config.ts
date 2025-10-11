@@ -17,8 +17,8 @@ export default mergeConfig(
       outDir: 'dist/worker',
       lib: {
         entry: 'src/runner/python/index.ts',
-        name: 'MKCodeMirror5Worker',
-        fileName: 'MKCodeMirror5Worker',
+        name: 'MKPyodideWorkerScript',
+        fileName: 'MKPyodideWorkerScript',
         formats: ['iife', 'cjs'],
       },
     },

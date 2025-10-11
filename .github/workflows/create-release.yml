@@ -30,7 +30,24 @@ jobs:
         run: yarn build
 
       - name: List build output
-        run: ls -R dist
+        run: |
+          VERSION=${GITHUB_REF_NAME}
+          ls -R dist
+          rm -rf dist/out
+          mkdir -p dist/out
+          cp -rf dist/demo/* dist/out/
+          cp -rf dist/main/* dist/out/
+          cp -rf dist/worker/* dist/out/
+
+          cd dist/out
+          for f in *; do
+            if [ -f "$f" ]; then
+              base="${f%.*}"
+              ext="${f##*.}"
+              mv "$f" "${base}.${VERSION}.${ext}"
+            fi
+          done
+          cd -
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
