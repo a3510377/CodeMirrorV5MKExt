@@ -1,12 +1,14 @@
 # CodeMirror V5 MK 擴充
 
 一個強大的 CodeMirror 5 擴充函式庫，加入了現代 IDE 級別的功能和增強特性，以創造更好的程式碼編輯體驗。
+該檔案最初為 AI 生成，經過不太認真的人工編輯和校正。
 
-[English](./README.md) | [简体中文](./README.zh-CN.md) | 繁體中文
+[English](./README.md)| 繁體中文
 
 ## 功能特性
 
 ### 🎨 增強的編輯器體驗
+
 - **Dracula 主題** - 預設使用精美的深色主題
 - **行號** - 清晰的行號顯示，帶有增強樣式
 - **活動行高亮** - 當前行的視覺回饋
@@ -15,6 +17,7 @@
 - **自動閉合括號** - 智慧括號補全
 
 ### 🔧 進階編輯功能
+
 - **多游標** - 同時編輯多個位置
   - `Ctrl-D`: 選擇下一個匹配項
   - `Shift-Ctrl-L`: 選擇所有匹配項
@@ -29,100 +32,24 @@
   - `Shift-Tab`: 減少縮排
 
 ### 💡 程式碼智慧
+
 - **自動補全** - 上下文感知的程式碼補全 (`Ctrl-Space`)
 - **程式碼摺疊** - 摺疊和展開程式碼區塊
 - **Token 懸停** - 增強的程式碼標記懸停資訊
 - **特殊字元顯示** - 視覺化空白字元和特殊字元
 
 ### 🐍 Python 支援
+
 - **Pyodide 整合** - 直接在瀏覽器中執行 Python 程式碼
 - **Python REPL** - 互動式 Python 執行
 - **自訂 Python 縮排單位** - Python 正確的 4 空格縮排
 
 ### 🎯 導覽和工具
+
 - **跳轉到行** - 快速導覽到特定行 (`Ctrl-G`)
 - **註解切換** - 快速註解/取消註解 (`Ctrl-/`)
 - **狀態列** - 顯示游標位置和編輯器狀態
 - **搜尋和取代** - 內建搜尋功能
-
-## 安裝
-
-### 使用 npm/yarn
-
-```bash
-npm install codemirror-v6-demo
-# 或
-yarn add codemirror-v6-demo
-```
-
-### 使用 CDN
-
-從您的 CDN 或本地建置引入檔案：
-
-```html
-<link rel="stylesheet" href="path/to/dist/main/MKCodeMirror5.css">
-<script src="path/to/dist/main/MKCodeMirror5.iife.js"></script>
-```
-
-## 使用方法
-
-### 基本設定
-
-```typescript
-import { createEditor } from 'codemirror-v6-demo';
-
-// 建立編輯器實例
-const { editor, libController } = await createEditor({
-  parent: document.getElementById('app'),
-  mode: 'javascript',
-  value: 'console.log("Hello, World!");',
-});
-```
-
-### 設定選項
-
-```typescript
-interface CreateEditorOptions {
-  // CodeMirror 設定選項
-  mode?: string;           // 語言模式（例如：'javascript', 'python'）
-  value?: string;          // 初始編輯器內容
-  theme?: string;          // 編輯器主題（預設：'dracula'）
-  lineNumbers?: boolean;   // 顯示行號（預設：true）
-  
-  // 自訂選項
-  indentSize?: number;     // 自訂縮排大小
-  parent?: HTMLElement;    // 要附加編輯器的父元素
-  container?: HTMLElement; // 自訂容器元素
-  textareaID?: string;     // 自訂 textarea ID
-  
-  // ... 以及所有其他 CodeMirror.EditorConfiguration 選項
-}
-```
-
-### 範例：使用 Pyodide 的 Python 編輯器
-
-```typescript
-import { createEditor } from 'codemirror-v6-demo';
-import { WorkerPool } from 'codemirror-v6-demo/runner/python';
-
-// 建立 Python 編輯器
-const { editor } = await createEditor({
-  parent: document.getElementById('app'),
-  mode: 'python',
-  value: 'print("Hello from Python!")',
-});
-
-// 設定 Python 執行
-const outputEl = document.getElementById('output');
-const appendOutput = createDefaultOutputHandler(outputEl);
-const workerPool = new WorkerPool(1, appendOutput);
-
-// 執行 Python 程式碼
-document.getElementById('run-btn').addEventListener('click', async () => {
-  const code = editor.getValue();
-  await workerPool.execute(code);
-});
-```
 
 ## 開發
 
@@ -191,24 +118,25 @@ CodeMirrorV5MKExt/
 
 ## 鍵盤快捷鍵
 
-| 快捷鍵 | 動作 |
-|----------|--------|
-| `Ctrl-Space` | 觸發自動補全 |
-| `Ctrl-/` | 切換註解 |
-| `Tab` | 智慧 Tab/縮排 |
-| `Shift-Tab` | 減少縮排 |
-| `Enter` | 智慧換行並縮排 |
-| `Ctrl-D` | 選擇下一個匹配項 |
-| `Shift-Ctrl-L` | 選擇所有匹配項 |
-| `Ctrl-Alt-Up` | 在上方新增游標 |
-| `Ctrl-Alt-Down` | 在下方新增游標 |
-| `Alt-Up` | 上移行 |
-| `Alt-Down` | 下移行 |
-| `Ctrl-G` | 跳轉到行 |
+| 快捷鍵          | 動作             |
+| --------------- | ---------------- |
+| `Ctrl-Space`    | 觸發自動補全     |
+| `Ctrl-/`        | 切換註解         |
+| `Tab`           | 智慧 Tab/縮排    |
+| `Shift-Tab`     | 減少縮排         |
+| `Enter`         | 智慧換行並縮排   |
+| `Ctrl-D`        | 選擇下一個匹配項 |
+| `Shift-Ctrl-L`  | 選擇所有匹配項   |
+| `Ctrl-Alt-Up`   | 在上方新增游標   |
+| `Ctrl-Alt-Down` | 在下方新增游標   |
+| `Alt-Up`        | 上移行           |
+| `Alt-Down`      | 下移行           |
+| `Ctrl-G`        | 跳轉到行         |
 
 ## 瀏覽器支援
 
 此函式庫支援所有支援以下特性的現代瀏覽器：
+
 - ES6+ JavaScript 特性
 - Web Workers
 - CodeMirror 5
