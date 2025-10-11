@@ -36,19 +36,19 @@ jobs:
           rm -rf dist/out
           mkdir -p dist/out
 
-          cd dist/demo && zip -r ../out/demo.zip . && cd -
+          cd dist/demo && zip -r ../out/demo.zip . && cd - || exit
           cp -rf dist/main/* dist/out/
           cp -rf dist/worker/* dist/out/
 
-          cd dist/out
+          cd dist/out || exit
           for f in *; do
             if [ -f "$f" ]; then
-              base="${f%.*}"
-              ext="${f##*.}"
-              mv "$f" "${VERSION}-${base}.${ext}"
+              base="${f%%.*}"
+              ext="${f#"$base"}"
+              mv "$f" "${base}-${VERSION}${ext}"
             fi
           done
-          cd -
+          cd - || exit
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
