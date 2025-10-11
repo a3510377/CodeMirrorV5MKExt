@@ -1,7 +1,8 @@
 # CodeMirror V5 MK 擴充
 
 一個強大的 CodeMirror 5 擴充函式庫，加入了現代 IDE 級別的功能和增強特性，以創造更好的程式碼編輯體驗。
-該檔案最初為 AI 生成，經過不太認真的人工編輯和校正。
+
+本 `README.md` 最初為 AI 生成，經過不太認真的人工編輯和校正。
 
 [English](./README.md)| 繁體中文
 
@@ -105,7 +106,8 @@ CodeMirrorV5MKExt/
 │   │   ├── specialCharsShow.ts
 │   │   └── statusbar.ts
 │   ├── plugins/         # 編輯器外掛
-│   ├── runner/          # 程式碼執行（Python/Pyodide）
+│   ├── lang/            # 語言支援模組
+│   │   └── python/      # Python 語言支援
 │   ├── utils/           # 工具函式
 │   └── index.ts         # 主要進入點
 ├── dist/                # 建置輸出

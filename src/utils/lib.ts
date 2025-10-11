@@ -22,7 +22,7 @@ export class MKLibController {
     `${name.replace(/[^a-z0-9]/gi, '-')}-lib-${type}`;
 
   async addLib(
-    name: string,
+    name: LibName,
     type?: 'js' | 'css',
     asyncLoad: boolean = false
   ): Promise<void> {

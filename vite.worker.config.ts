@@ -16,7 +16,7 @@ export default mergeConfig(
     build: {
       outDir: 'dist/worker',
       lib: {
-        entry: 'src/runner/python/index.ts',
+        entry: 'src/lang/python/runner/index.ts',
         name: 'MKPyodideWorkerScript',
         fileName: 'MKPyodideWorkerScript',
         formats: ['iife', 'cjs'],

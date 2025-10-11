@@ -1,6 +1,7 @@
 import { DEFAULT_INDENT_UNIT, PYTHON_INDENT_UNIT } from './constants';
 import { loadExtensions } from './extensions';
 import { createElement } from './utils/dom';
+import { checkInstallHintLibs } from './utils/langHintRegister';
 import { MKLibController } from './utils/lib';
 import { loadLibFromOption } from './utils/loadLibFromOption';
 
@@ -80,12 +81,16 @@ export const createEditor = async (options?: CreateEditorOptions) => {
     } as const satisfies CodeMirror.CommandsKeyMap,
   };
 
-  // TODO: Load libraries based on options (short key)
-  await libController.addLib('addon/dialog/dialog');
-  await libController.addLib('addon/comment/comment');
-  await libController.addLib('addon/search/searchcursor');
-
+  // Load libs from options
   const setupEditorFn = await loadLibFromOption(libController, finalOptions);
+
+  // Make sure hint libraries are loaded before creating the editor
+  await checkInstallHintLibs(finalOptions);
+
+  // TODO: Load libraries based on options (short key)
+  libController.addLib('addon/dialog/dialog');
+  libController.addLib('addon/comment/comment');
+  libController.addLib('addon/search/searchcursor');
 
   const editor = window.CodeMirror.fromTextArea(textarea, finalOptions);
   await setupEditorFn(editor);

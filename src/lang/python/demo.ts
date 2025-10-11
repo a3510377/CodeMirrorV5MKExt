@@ -1,4 +1,5 @@
-import { createDefaultOutputHandler, WorkerPool } from '.';
+import { createDefaultOutputHandler, WorkerPool } from './runner';
+
 import { createEditor } from '@';
 
 // Maximum number of output lines to keep

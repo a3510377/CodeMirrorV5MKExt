@@ -18,7 +18,12 @@ const statusBarCSS = `$css
     background: var(--cm-statusbar-background);
     font-size: 12px;
     padding: 4px 10px;
-    font-family: monospace;
+  }
+
+  .cm-s-dracula ~ .${MK_CUSTOM_COMPONENT}.${statusBarClass} {
+    color: #f8f8f2;
+    border-top: 1px solid #44475a;
+    background-color: #282a36;
   }
 `;
 
@@ -30,7 +35,7 @@ export const statusbar = () => {
     const statusBar = createElement('div', statusBarClass);
     statusBar.innerHTML = `$html
       <span>字數: <span id="char-count">0</span></span>
-      <span>第 <span id="cursor-line">1</span> 行，第<span id="cursor-col">1</span> 欄
+      <span>第 <span id="cursor-line">1</span> 行，第 <span id="cursor-col">1</span> 欄
       <span id="selection" style="display:none">(已選取: <span id="selection-count">0</span>)</span>
     `;
 
@@ -42,7 +47,7 @@ export const statusbar = () => {
     const selectionCount =
       statusBar.querySelector<HTMLSpanElement>('#selection-count')!;
 
-    editor.getWrapperElement().appendChild(statusBar);
+    editor.getWrapperElement().parentElement?.appendChild(statusBar);
 
     const updateStatus = (editor: CodeMirror.Editor) => {
       const text = editor.getValue();
