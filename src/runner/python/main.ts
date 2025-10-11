@@ -20,7 +20,8 @@ addEventListener('DOMContentLoaded', async () => {
 
   const { editor } = await createEditor({
     mode: 'python',
-    value: 'print("Hello Pyodide!")\n\nraise Exception("測試錯誤")\n',
+    value:
+      'print("Hello Pyodide!")\n\nraise Exception("測試錯誤")\n\nwhile True:\n    print("test")\n',
     parent: document.querySelector('#editor') as HTMLElement,
     textareaID: 'code-editor-textarea',
   });

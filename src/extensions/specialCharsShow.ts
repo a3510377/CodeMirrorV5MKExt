@@ -27,10 +27,10 @@ const Names: { [key: string]: string } = {
 
 const specialCharsShowCSS = `$css
   :root {
-    --cm-space-color: #dfdfdf;
+    --cm-space-color: #9a9a9a;
   }
 
-  .cm-tab {
+  .CodeMirror-selectedtext .cm-tab {
     background-size: auto 100%;
     background-repeat: no-repeat;
     background-position: right 90%;
@@ -38,6 +38,11 @@ const specialCharsShowCSS = `$css
   }
 
   .${MK_CUSTOM_COMPONENT}.cm-space::before {
+    content: ' ';
+    color: var(--cm-space-color);
+  }
+
+  .CodeMirror-selectedtext .${MK_CUSTOM_COMPONENT}.cm-space::before {
     content: '·';
     color: var(--cm-space-color);
   }
@@ -68,7 +73,7 @@ export const specialCharsShow = () => {
 
       if (code === 10) char = '␤';
       else if (code >= 32) char = '•';
-      else char = String.fromCharCode(9216 + code);
+      else char = String.fromCharCode(0x2400 + code);
 
       const el = createElement('span', 'cm-invalidchar');
       el.textContent = char;

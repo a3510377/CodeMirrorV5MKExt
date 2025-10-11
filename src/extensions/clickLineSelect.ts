@@ -4,11 +4,21 @@ const handleGutterClick = (
   _gutter: string,
   event: Event
 ) => {
+  // only respond to clicks on line numbers
+  if (
+    !(
+      event instanceof MouseEvent &&
+      event.target instanceof HTMLElement &&
+      event.target.className.includes('CodeMirror-linenumber')
+    )
+  ) {
+    return;
+  }
+
   const start = { line, ch: 0 };
   const end = { line: line + 1, ch: 0 };
 
-  const mouseEvent = event as MouseEvent;
-  if (!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+  if (!(event.ctrlKey || event.metaKey)) {
     editor.setSelection(start, end);
     return;
   }

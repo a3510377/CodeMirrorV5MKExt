@@ -6,7 +6,7 @@ import type CodeMirror from 'codemirror';
 const indentGuideClass = 'cm-indent-guide';
 const indentGuideCSS = `$css
   :root {
-    --cm-indent-guide-color: #e0e0e0;
+    --cm-indent-guide-color: #575757ff;
   }
 
   .${MK_CUSTOM_COMPONENT}.${indentGuideClass} {

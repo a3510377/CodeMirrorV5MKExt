@@ -1,10 +1,5 @@
 import type { LibName, MKLibController } from '@/utils/lib';
 
-type OptionLibMapValue =
-  | LibName
-  | LibName[]
-  | { [k: string]: LibName | LibName[] };
-
 const optionLibMap: {
   [key: string]: OptionLibMapValue;
 } = {
@@ -33,6 +28,7 @@ const optionLibMap: {
   styleActiveLine: 'addon/selection/active-line',
   styleSelectedText: 'addon/selection/mark-selection',
   selectionPointer: 'addon/selection/selection-pointer',
+  theme: { dracula: 'theme/dracula' },
 };
 
 export const loadLibFromOption = async (
@@ -106,3 +102,8 @@ export const loadLibFromOption = async (
     };
   };
 };
+
+export type OptionLibMapValue =
+  | LibName
+  | LibName[]
+  | { [k: string]: LibName | LibName[] };

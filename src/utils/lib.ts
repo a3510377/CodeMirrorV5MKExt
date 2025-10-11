@@ -12,6 +12,7 @@ const withCssLibs: LibName[] = [
   'addon/scroll/simplescrollbars',
   'addon/search/matchesonscrollbar',
   'addon/tern/tern',
+  'theme/dracula',
 ];
 
 export class MKLibController {
@@ -25,7 +26,7 @@ export class MKLibController {
     type?: 'js' | 'css',
     asyncLoad: boolean = false
   ): Promise<void> {
-    if (!/^[\da-zA-Z\/]+$/.test(name)) return Promise.resolve();
+    if (!/^[\da-zA-Z\-\/]+$/.test(name)) return Promise.resolve();
 
     const promises: Promise<void>[] = [];
 
@@ -36,7 +37,7 @@ export class MKLibController {
       );
     }
 
-    if (type !== 'css') {
+    if (type !== 'css' && !name.startsWith('theme/')) {
       promises.push(
         this.addScript(
           name,
@@ -157,4 +158,5 @@ export type LibName =
   | 'addon/tern/tern'
   | 'addon/tern/worker'
   | 'addon/wrap/hardwrap'
-  | 'mode/python/python';
+  | 'mode/python/python'
+  | 'theme/dracula';
