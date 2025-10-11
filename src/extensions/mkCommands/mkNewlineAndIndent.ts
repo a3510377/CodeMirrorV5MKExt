@@ -17,7 +17,7 @@ export const mkNewlineAndIndent = (cm: CodeMirror.Editor) => {
       cm.getMode().indent?.(currentLineStatus, line, currentLineIndent) ?? 0;
 
     // Insert newline
-    doc.replaceRange(doc.lineSeparator(), anchor, head, '+input');
+    doc.replaceRange(doc.lineSeparator(), anchor, head, 'input');
 
     let indentSize;
     if (isPython) {
@@ -61,7 +61,7 @@ export const mkNewlineAndIndent = (cm: CodeMirror.Editor) => {
       ? '\t'.repeat(Math.floor(indentSize / tabSize)) +
         ' '.repeat(indentSize % tabSize)
       : ' '.repeat(indentSize);
-    doc.replaceRange(indentStr, doc.getCursor(), undefined, '+input');
+    doc.replaceRange(indentStr, doc.getCursor(), undefined, 'input');
 
     // Ensure cursor is visible after operation
     cm.scrollIntoView(null, 0);
@@ -72,7 +72,7 @@ export const mkNewlineAndIndent = (cm: CodeMirror.Editor) => {
         '',
         { line: head.line, ch: 0 },
         { line: head.line, ch: head.ch },
-        '+input'
+        'input'
       );
     }
   }
