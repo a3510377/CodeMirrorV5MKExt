@@ -1,8 +1,6 @@
-export const pythonHintNeedLibs = {
-  python: ['addon/hint/anyword-hint'],
-} as const;
+import type { HintLibInfos } from '@/utils/langHintRegister';
 
-export const pythonAnywordHint = (cm: CodeMirror.Editor) => {
+export const pythonAnywordHint = ((cm) => {
   const cursor = cm.getCursor();
   const token = cm.getTokenAt(cursor);
   const word = token.string.slice(0, cursor.ch - token.start);
@@ -18,7 +16,14 @@ export const pythonAnywordHint = (cm: CodeMirror.Editor) => {
     from: { line: cursor.line, ch: token.start },
     to: { line: cursor.line, ch: token.end },
   };
-};
+}) as CodeMirror.HintFunction;
+
+export const pythonHintConfig = {
+  python: {
+    hint: pythonAnywordHint,
+    libs: ['addon/hint/anyword-hint'],
+  },
+} as const satisfies HintLibInfos;
 
 export default pythonAnywordHint;
 

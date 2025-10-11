@@ -1,7 +1,11 @@
 import { DEFAULT_INDENT_UNIT, PYTHON_INDENT_UNIT } from './constants';
 import { loadExtensions } from './extensions';
 import { createElement } from './utils/dom';
-import { checkInstallHintLibs } from './utils/langHintRegister';
+import {
+  checkInstallHintLibs,
+  enableHint,
+  type HintLibID,
+} from './utils/langHintRegister';
 import { MKLibController } from './utils/lib';
 import { loadLibFromOption } from './utils/loadLibFromOption';
 
@@ -95,6 +99,16 @@ export const createEditor = async (options?: CreateEditorOptions) => {
   const editor = window.CodeMirror.fromTextArea(textarea, finalOptions);
   await setupEditorFn(editor);
 
+  // TODO: Move to options, hot configurable
+  const { hintMode } = options || {};
+  if (hintMode === undefined || hintMode) {
+    if (hintMode === undefined && options?.mode === 'python') {
+      options.hintMode = 'python';
+    }
+
+    enableHint(editor, hintMode ?? 'anyword');
+  }
+
   if (options?.value) {
     editor.setValue(options.value as string);
     editor.clearHistory();
@@ -111,4 +125,6 @@ export interface CreateEditorOptions
   parent?: HTMLElement;
   container?: HTMLElement;
   textareaID?: string;
+
+  hintMode?: HintLibID;
 }
