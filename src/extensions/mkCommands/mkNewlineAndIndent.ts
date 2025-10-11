@@ -31,18 +31,20 @@ export const mkNewlineAndIndent = (cm: CodeMirror.Editor) => {
         'yield',
       ];
       const isDedent = dedentKeywords.some((k) => trimmed.startsWith(k));
+      const indentUnit = cm.getOption('indentUnit') ?? 4;
 
       // Dedent keyword -> dedent one level
-      if (isDedent) indentSize = Math.max(langIndent - 4, 0);
+      if (isDedent) indentSize = Math.max(langIndent - indentUnit, 0);
       // Line ends with colon -> indent one level
       else if (trimmed.endsWith(':')) indentSize = langIndent;
       // Cursor is at the end of indentation -> keep or revert to computed indent
       else if (atIndentEnd) {
-        indentSize = currentSize <= langIndent ? currentSize : langIndent - 4;
+        if (currentSize <= langIndent) indentSize = currentSize;
+        else indentSize = langIndent - indentUnit;
       }
       // Empty line -> revert to previous indentation level
       else if (!trimmed) {
-        indentSize = Math.max(langIndent - 4, 0);
+        indentSize = Math.max(langIndent - indentUnit, 0);
       }
       // Cursor is in the middle of code -> keep current indent
       else indentSize = currentSize;
