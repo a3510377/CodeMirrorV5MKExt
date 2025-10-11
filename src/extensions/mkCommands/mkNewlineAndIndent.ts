@@ -1,3 +1,5 @@
+import { PYTHON_INDENT_UNIT } from '@/constants';
+
 export const mkNewlineAndIndent = (cm: CodeMirror.Editor) => {
   const doc = cm.getDoc();
   const selects = cm.listSelections();
@@ -31,7 +33,7 @@ export const mkNewlineAndIndent = (cm: CodeMirror.Editor) => {
         'yield',
       ];
       const isDedent = dedentKeywords.some((k) => trimmed.startsWith(k));
-      const indentUnit = cm.getOption('indentUnit') ?? 4;
+      const indentUnit = cm.getOption('indentUnit') ?? PYTHON_INDENT_UNIT;
 
       // Dedent keyword -> dedent one level
       if (isDedent) indentSize = Math.max(langIndent - indentUnit, 0);

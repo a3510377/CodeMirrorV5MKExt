@@ -1,4 +1,4 @@
-import { MK_CUSTOM_COMPONENT } from '@/constants';
+import { DEFAULT_INDENT_UNIT, MK_CUSTOM_COMPONENT } from '@/constants';
 import { createElement, createStyle } from '@/utils/dom';
 
 import type CodeMirror from 'codemirror';
@@ -33,7 +33,7 @@ const updateIndentGuide = (
   elt: HTMLElement
 ) => {
   const text = line.text;
-  const indentUnit = cm.getOption('indentUnit') ?? 2;
+  const indentUnit = cm.getOption('indentUnit') ?? DEFAULT_INDENT_UNIT;
 
   let spaceCount = 0;
   let indentLevel = 0;

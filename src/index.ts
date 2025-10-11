@@ -1,3 +1,4 @@
+import { DEFAULT_INDENT_UNIT, PYTHON_INDENT_UNIT } from './constants';
 import { loadExtensions } from './extensions';
 import { createElement } from './utils/dom';
 import { MKLibController } from './utils/lib';
@@ -7,8 +8,10 @@ import './plugins/optionPlus';
 import './plugins/tokenHover';
 import type CodeMirror from 'codemirror';
 
+const libController = new MKLibController();
+
 // @ts-ignore
-window.CodeMirror.__mk_libs__ = new MKLibController();
+window.CodeMirror.__mk_libs__ = libController;
 
 loadExtensions();
 
@@ -22,8 +25,8 @@ export const createEditor = async (options?: CreateEditorOptions) => {
   editorContainer.classList.add(`${options?.mode}-mode`);
   options?.parent?.appendChild(editorContainer);
 
-  let defaultIndentSize = 2;
-  if (options?.mode === 'python') defaultIndentSize = 4;
+  let defaultIndentSize = DEFAULT_INDENT_UNIT;
+  if (options?.mode === 'python') defaultIndentSize = PYTHON_INDENT_UNIT;
 
   const finalOptions: Partial<CodeMirror.EditorConfiguration> = {
     lineNumbers: true,
@@ -37,7 +40,7 @@ export const createEditor = async (options?: CreateEditorOptions) => {
     showCursorWhenSelecting: true,
 
     // Placeholder text
-    placeholder: '打這裡！！',
+    placeholder: 'Start coding...',
     // Highlight matching brackets
     matchBrackets: true,
     // Highlight the active line
@@ -54,34 +57,35 @@ export const createEditor = async (options?: CreateEditorOptions) => {
     // Code completion configuration
     hintOptions: { completeSingle: false },
 
-    extraKeys: {
-      'Ctrl-Space': 'autocomplete',
-      'Cmd-Space': 'autocomplete',
-      'Ctrl-/': 'toggleComment',
-      'Cmd-/': 'toggleComment',
-      Tab: 'indentMore',
-      'Shift-Tab': 'indentLess',
-      Enter: 'mkNewlineAndIndent',
-
-      // 'Ctrl-F': 'findPersistent',
-      // 'Cmd-F': 'findPersistent',
-      // 'Ctrl-G': 'findNext',
-      // 'Cmd-G': 'findNext',
-      // 'Shift-Ctrl-G': 'findPrev',
-      // 'Shift-Cmd-G': 'findPrev',
-    } as const satisfies CodeMirror.CommandsKeyMap,
-
     // Code folding
     foldGutter: true,
     gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
 
     ...options,
+
+    extraKeys: {
+      'Ctrl-Space': 'autocomplete',
+      'Ctrl-/': 'toggleComment',
+      'Shift-Tab': 'indentLess',
+
+      Tab: 'mkTab',
+      Enter: 'mkNewlineAndIndent',
+      'Ctrl-Alt-Up': 'mkMoveCursorsUp',
+      'Ctrl-Alt-Down': 'mkMoveCursorsDown',
+      'Ctrl-D': 'mkSelectNextOccurrence',
+      'Shift-Ctrl-L': 'mkSelectAllOccurrences',
+      'Alt-Up': 'mkSwapLineUp',
+      'Alt-Down': 'mkSwapLineDown',
+      'Ctrl-G': 'mkJumpToLine',
+    } as const satisfies CodeMirror.CommandsKeyMap,
   };
 
-  const setupEditorFn = await loadLibFromOption(
-    window.CodeMirror.__mk_libs__,
-    finalOptions
-  );
+  // TODO: Load libraries based on options (short key)
+  await libController.addLib('addon/dialog/dialog');
+  await libController.addLib('addon/comment/comment');
+  await libController.addLib('addon/search/searchcursor');
+
+  const setupEditorFn = await loadLibFromOption(libController, finalOptions);
 
   const editor = window.CodeMirror.fromTextArea(textarea, finalOptions);
   await setupEditorFn(editor);
@@ -93,7 +97,7 @@ export const createEditor = async (options?: CreateEditorOptions) => {
 
   editor.refresh();
 
-  return { editor, libController: window.CodeMirror.__mk_libs__ };
+  return { editor, libController };
 };
 
 export interface CreateEditorOptions
