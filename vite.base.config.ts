@@ -7,6 +7,7 @@ import { defineConfig } from 'vite';
 import htmlFileMinify from 'vite-plugin-html-minifier';
 
 export const baseConfig = {
+  base: './',
   // TODO move to plugins dir
   plugins: [
     htmlFileMinify(),
