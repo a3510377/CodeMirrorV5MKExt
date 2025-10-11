@@ -45,7 +45,7 @@ jobs:
             if [ -f "$f" ]; then
               base="${f%.*}"
               ext="${f##*.}"
-              mv "$f" "${base}.${VERSION}.${ext}"
+              mv "$f" "${VERSION}-${base}.${ext}"
             fi
           done
           cd -
