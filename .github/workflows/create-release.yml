@@ -35,7 +35,8 @@ jobs:
           ls -R dist
           rm -rf dist/out
           mkdir -p dist/out
-          cp -rf dist/demo/* dist/out/
+
+          cd dist/main && zip -r ../out/main.zip . && cd -
           cp -rf dist/main/* dist/out/
           cp -rf dist/worker/* dist/out/
 
@@ -57,9 +58,6 @@ jobs:
           body: |
             - Tag: ${{ github.ref_name }}
             - Commit: ${{ github.sha }}
-          files: |
-            dist/main/*
-            dist/worker/*
-            dist/demo/*
+          files: dist/out/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
