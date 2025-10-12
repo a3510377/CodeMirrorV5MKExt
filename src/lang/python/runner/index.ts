@@ -113,6 +113,7 @@ export class WorkerPool {
   private _queue: Task[] = [];
   private _appendOutput: AppendOutputHandler;
   private _maxExecutionTime: number;
+  private _decoder = new TextDecoder('utf-8', { fatal: false });
 
   onStateChange?: (
     available: boolean,
@@ -145,9 +146,12 @@ export class WorkerPool {
   }
 
   private _decodeOutput(output: string | number | number[]): string {
-    if (Array.isArray(output)) return String.fromCharCode(...output);
-    if (typeof output === 'number') return String.fromCharCode(output);
-    return output;
+    if (typeof output === 'string') return output;
+
+    return this._decoder.decode(
+      Array.isArray(output) ? new Uint8Array(output) : Uint8Array.of(output),
+      { stream: true }
+    );
   }
 
   async run(
@@ -176,6 +180,8 @@ export class WorkerPool {
       const cleanup = () => {
         if (timeoutHandle) clearTimeout(timeoutHandle);
         worker.removeEventListener('message', handler);
+        this._decoder.decode(); // flush
+
         wrapper.busy = false;
         this._emitStateChange();
       };
@@ -200,6 +206,7 @@ export class WorkerPool {
             const { result } = data;
             if (result.type === 'success') task.resolve(result);
             else task.reject({ ...result, type: 'end' });
+
             this._processQueue();
             break;
           case 'error':
