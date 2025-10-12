@@ -7,7 +7,7 @@ const MAX_LINES = 2000;
 // Maximum number of workers to run code (to limit resource usage)
 const MAX_WORKERS = 2;
 // Maximum execution time for each code run (in ms)
-const EXECUTION_TIMEOUT = 10_000; // ms
+const EXECUTION_TIMEOUT = 5_000; // ms
 
 const ERROR_MESSAGES = {
   EXEC_TIMEOUT: '程式執行時間過長，已被強制終止',
@@ -21,8 +21,23 @@ addEventListener('DOMContentLoaded', async () => {
 
   const { editor } = await createEditor({
     mode: 'python',
-    value:
-      'print("Hello Pyodide!")\n\nraise Exception("測試錯誤")\n\nwhile True:\n    print("test")\n',
+    value: `import time
+
+print("Hello Pyodide!")
+
+print("…", end="")
+print("你好🐍🔥", end="")
+
+time.sleep(0.5)
+
+print()
+print("Hello after sleep!")
+
+raise Exception("測試錯誤")
+
+while True:
+    print("test")
+`,
     parent: document.querySelector('#editor') as HTMLElement,
     textareaID: 'code-editor-textarea',
   });

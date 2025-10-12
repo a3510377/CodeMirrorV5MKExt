@@ -42,7 +42,22 @@ self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
       const batch = buf.splice(0, size ?? MAX_BATCH);
       postMessage({ type, data: batch });
     }
-    return buf;
+  };
+
+  let timeoutFlush: ReturnType<typeof setTimeout> | null = null;
+  const scheduleFlush = () => {
+    if (timeoutFlush) return;
+    timeoutFlush = setTimeout(() => {
+      flushBatch(bufOut, 'stdout', bufOut.length);
+      flushBatch(bufErr, 'stderr', bufErr.length);
+
+      timeoutFlush = null;
+      lastFlushTime = performance.now();
+
+      if (bufOut.length || bufErr.length) {
+        scheduleFlush();
+      }
+    }, FLUSH_INTERVAL);
   };
 
   const push = (buf: number[], t: number) => {
@@ -50,9 +65,13 @@ self.onmessage = async (event: MessageEvent<PyodideRunnerMessageEventData>) => {
 
     const now = performance.now();
     if (now - lastFlushTime >= FLUSH_INTERVAL) {
-      if (bufOut.length) flushBatch(bufOut, 'stdout');
-      if (bufErr.length) flushBatch(bufErr, 'stderr');
+      bufOut.length && flushBatch(bufOut, 'stdout', bufOut.length);
+      bufErr.length && flushBatch(bufErr, 'stderr', bufErr.length);
       lastFlushTime = now;
+    }
+
+    if (!timeoutFlush && (bufOut.length || bufErr.length)) {
+      scheduleFlush();
     }
   };
 

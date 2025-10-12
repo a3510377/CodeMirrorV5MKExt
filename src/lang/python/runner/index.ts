@@ -76,6 +76,7 @@ class WorkerWrapper {
   isReady = false;
   ready!: Promise<void>;
   worker!: Worker;
+  startTime?: number;
 
   private _emitStateChange: () => void;
 
@@ -100,6 +101,9 @@ class WorkerWrapper {
     };
 
     this.worker.addEventListener('message', handler);
+    this.worker.addEventListener('messageerror', (e) => {
+      console.error('Worker message error:', e);
+    });
   }
 }
 
@@ -191,7 +195,25 @@ export class WorkerPool {
         this._emitStateChange();
       };
 
+      const forceCloseTimeoutHandler = () => {
+        cleanup();
+        task.reject({ type: 'error', error: 'EXEC_TIMEOUT' });
+        resetWorker();
+        this._processQueue();
+      };
+
       const handler = (e: MessageEvent<PyodideRunnerMessageEventResult>) => {
+        // If the Worker continuously sends a large number of messages in a short time,
+        // the main thread's event queue can become overloaded, causing setTimeout to fire late.
+        // We forcibly trigger the timeout handler here to prevent prolonged blocking.
+        if (
+          timeoutHandle &&
+          wrapper.startTime !== undefined &&
+          performance.now() - wrapper.startTime > this._maxExecutionTime
+        ) {
+          forceCloseTimeoutHandler();
+        }
+
         const data = e.data;
         switch (data.type) {
           case 'stdout':
@@ -219,15 +241,14 @@ export class WorkerPool {
       };
 
       worker.addEventListener('message', handler);
+      wrapper.startTime = performance.now();
       worker.postMessage({ code: task.code, options: task.options });
 
       if (this._maxExecutionTime > 0) {
-        timeoutHandle = setTimeout(() => {
-          cleanup();
-          task.reject({ type: 'error', error: 'EXEC_TIMEOUT' });
-          resetWorker();
-          this._processQueue();
-        }, this._maxExecutionTime);
+        timeoutHandle = setTimeout(
+          forceCloseTimeoutHandler,
+          this._maxExecutionTime
+        );
       }
     }
   }
