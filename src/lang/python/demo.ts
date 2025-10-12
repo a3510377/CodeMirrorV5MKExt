@@ -23,8 +23,10 @@ addEventListener('DOMContentLoaded', async () => {
     mode: 'python',
     value: `import time
 
+# Basic output
 print("Hello Pyodide!")
 
+# Unicode test and force flush test
 print("…", end="")
 print("你好🐍🔥", end="")
 
@@ -33,8 +35,13 @@ time.sleep(0.5)
 print()
 print("Hello after sleep!")
 
+# Test error output (should display traceback without internal frames)
 raise Exception("測試錯誤")
 
+# Timeout test
+while True: ...
+
+# Timeout test with stdout
 while True:
     print("test")
 `,
