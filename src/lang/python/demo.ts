@@ -3,7 +3,7 @@ import { createDefaultOutputHandler, WorkerPool } from './runner';
 import { createEditor } from '@';
 
 // Maximum number of output lines to keep
-const MAX_LINES = 500;
+const MAX_LINES = 2000;
 // Maximum number of workers to run code (to limit resource usage)
 const MAX_WORKERS = 2;
 // Maximum execution time for each code run (in ms)
