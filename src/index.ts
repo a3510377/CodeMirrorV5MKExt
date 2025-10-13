@@ -62,6 +62,9 @@ export const createEditor = async (options?: CreateEditorOptions) => {
     // Code completion configuration
     hintOptions: { completeSingle: false },
 
+    scrollbarStyle: 'overlay',
+    scrollButtonHeight: 30,
+
     // Code folding
     foldGutter: true,
     gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],

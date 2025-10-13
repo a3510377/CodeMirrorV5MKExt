@@ -29,6 +29,10 @@ const optionLibMap: {
   styleSelectedText: 'addon/selection/mark-selection',
   selectionPointer: 'addon/selection/selection-pointer',
   theme: { dracula: 'theme/dracula' },
+  scrollbarStyle: {
+    simple: 'addon/scroll/simplescrollbars',
+    overlay: 'addon/scroll/simplescrollbars',
+  },
 };
 
 export const loadLibFromOption = async (

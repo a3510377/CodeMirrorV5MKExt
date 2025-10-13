@@ -18,6 +18,7 @@
 /// <reference types='codemirror/addon/search/search' />
 /// <reference types='codemirror/addon/scroll/annotatescrollbar' />
 /// <reference types='codemirror/addon/scroll/scrollpastend' />
+/// <reference types='codemirror/addon/scroll/simplescrollbars' />
 /// <reference types='codemirror/addon/search/match-highlighter' />
 /// <reference types='codemirror/addon/selection/active-line' />
 /// <reference types='codemirror/addon/selection/mark-selection' />
